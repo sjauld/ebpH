@@ -1001,7 +1001,7 @@ int command_set_setting(struct pt_regs *ctx)
     }
 
 out:
-    // bpf_probe_write_user(rc_p, &rc, sizeof(rc));
+    bpf_probe_write_user(rc_p, &rc, sizeof(rc));
 
     return 0;
 }
@@ -1031,7 +1031,7 @@ int command_normalize_profile(struct pt_regs *ctx)
     ebph_start_normal(profile_key, NULL, profile);
 
 out:
-    // bpf_probe_write_user(rc_p, &rc, sizeof(rc));
+    bpf_probe_write_user(rc_p, &rc, sizeof(rc));
 
     return 0;
 }
@@ -1067,7 +1067,7 @@ int command_normalize_process(struct pt_regs *ctx)
     ebph_start_normal(s->profile_key, s, profile);
 
 out:
-    // bpf_probe_write_user(rc_p, &rc, sizeof(rc));
+    bpf_probe_write_user(rc_p, &rc, sizeof(rc));
 
     return 0;
 }
@@ -1097,7 +1097,7 @@ int command_sensitize_profile(struct pt_regs *ctx)
     ebph_reset_training_data(profile_key, NULL, profile);
 
 out:
-    // bpf_probe_write_user(rc_p, &rc, sizeof(rc));
+    bpf_probe_write_user(rc_p, &rc, sizeof(rc));
 
     return 0;
 }
@@ -1133,7 +1133,7 @@ int command_sensitize_process(struct pt_regs *ctx)
     ebph_reset_training_data(s->profile_key, s, profile);
 
 out:
-    // bpf_probe_write_user(rc_p, &rc, sizeof(rc));
+    bpf_probe_write_user(rc_p, &rc, sizeof(rc));
 
     return 0;
 }
@@ -1163,7 +1163,7 @@ int command_tolerize_profile(struct pt_regs *ctx)
     ebph_stop_normal(profile_key, NULL, profile);
 
 out:
-    // bpf_probe_write_user(rc_p, &rc, sizeof(rc));
+    bpf_probe_write_user(rc_p, &rc, sizeof(rc));
 
     return 0;
 }
@@ -1199,7 +1199,7 @@ int command_tolerize_process(struct pt_regs *ctx)
     ebph_stop_normal(s->profile_key, s, profile);
 
 out:
-    // bpf_probe_write_user(rc_p, &rc, sizeof(rc));
+    bpf_probe_write_user(rc_p, &rc, sizeof(rc));
 
     return 0;
 }
@@ -1247,7 +1247,7 @@ int command_bootstrap_process(struct pt_regs *ctx)
 
     ebph_do_exec_common(profile_key, pid, tgid, pathname);
 out:
-    // bpf_probe_write_user(rc_p, &rc, sizeof(rc));
+    bpf_probe_write_user(rc_p, &rc, sizeof(rc));
 
     return 0;
 }

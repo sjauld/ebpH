@@ -591,10 +591,6 @@ class BPFProgram:
         with open(defs.BPF_PROGRAM_C, 'r') as f:
             bpf_text = f.read()
 
-        logger.info(f'BPF text: {bpf_text}')
-        logger.info(f'USDT Contexts: {Lib.usdt_context}')
-        logger.info(f'Cflags: {self.cflags}')
-
         self.bpf = BPF(
             text=bpf_text, usdt_contexts=[Lib.usdt_context], cflags=self.cflags
         )
