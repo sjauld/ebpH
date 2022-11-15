@@ -95,6 +95,7 @@ class BPFProgram:
             self._load_bpf()
         except Exception as e:
             logger.error('Unable to load BPF program', exc_info=e)
+            logger.error(e)
             sys.exit(1)
         try:
             self._register_ring_buffers()
@@ -590,13 +591,15 @@ class BPFProgram:
         with open(defs.BPF_PROGRAM_C, 'r') as f:
             bpf_text = f.read()
 
-        logger.debug(f'BPF text: {bpf_text}')
+        logger.info(f'BPF text: {bpf_text}')
+        logger.info(f'USDT Contexts: {Lib.usdt_context}')
+        logger.info(f'Cflags: {self.cflags}')
 
         self.bpf = BPF(
             text=bpf_text, usdt_contexts=[Lib.usdt_context], cflags=self.cflags
         )
 
-        logger.debug('Unregistering BPG cleanup function')
+        logger.info('Unregistering BPG cleanup function')
 
         # FIXME: BPF cleanup function is segfaulting, so unregister it for now.
         # It actually doesn't really do anything particularly useful.
