@@ -47,7 +47,7 @@ from ebph import defs
 logger = get_logger()
 
 
-def ringbuf_callback(bpf: BPF, map_name: str, infer_type: bool = True, ratelimit_per_sec = 9999999999):
+def ringbuf_callback(bpf: BPF, map_name: str, infer_type: bool = True, ratelimit_per_sec=9999999999):
     """
     Decorator that wraps a function in all of the logic
     to associate it with a ringbuffer @map_name in BPF land.
@@ -73,7 +73,8 @@ class BPFProgram:
     """
     Wraps the BPF program and exposes methods for interacting with it.
     """
-    def __init__(self, debug: bool = False, log_sequences: bool = False, auto_save = True, auto_load = True):
+
+    def __init__(self, debug: bool = False, log_sequences: bool = False, auto_save=True, auto_load=True):
         self.bpf = None
         self.usdt_contexts = []
         self.seqstack_inner_bpf = None
@@ -113,7 +114,8 @@ class BPFProgram:
 
         self.change_setting(EBPH_SETTINGS.NORMAL_WAIT, defs.NORMAL_WAIT)
         self.change_setting(EBPH_SETTINGS.NORMAL_FACTOR, defs.NORMAL_FACTOR)
-        self.change_setting(EBPH_SETTINGS.NORMAL_FACTOR_DEN, defs.NORMAL_FACTOR_DEN)
+        self.change_setting(EBPH_SETTINGS.NORMAL_FACTOR_DEN,
+                            defs.NORMAL_FACTOR_DEN)
         self.change_setting(EBPH_SETTINGS.ANOMALY_LIMIT, defs.ANOMALY_LIMIT)
         self.change_setting(EBPH_SETTINGS.TOLERIZE_LIMIT, defs.TOLERIZE_LIMIT)
 
@@ -249,10 +251,12 @@ class BPFProgram:
                     f.readinto(profile)
                 # Wrong version
                 if profile.magic != calculate_profile_magic():
-                    logger.debug(f'Wrong magic number for profile {fname}, skipping.')
+                    logger.debug(
+                        f'Wrong magic number for profile {fname}, skipping.')
                     continue
                 profile.load_into_bpf(self.bpf)
-                self.profile_key_to_exe[profile.profile_key] = profile.exe.decode('ascii')
+                self.profile_key_to_exe[profile.profile_key] = profile.exe.decode(
+                    'ascii')
                 exe = self.profile_key_to_exe[profile.profile_key]
                 logger.debug(f'Successfully loaded profile {fname} ({exe}).')
             except Exception as e:
@@ -296,7 +300,8 @@ class BPFProgram:
             logger.error(f'Unable to normalize profile.', exc_info=e)
             return -1
         if rc < 0:
-            logger.error(f'Unable to normalize profile: {os.strerror(ct.get_errno())}')
+            logger.error(
+                f'Unable to normalize profile: {os.strerror(ct.get_errno())}')
         return rc
 
     def normalize_process(self, pid: int):
@@ -309,7 +314,8 @@ class BPFProgram:
             logger.error(f'Unable to normalize process {pid}.', exc_info=e)
             return -1
         if rc < 0:
-            logger.error(f'Unable to normalize process {pid}: {os.strerror(ct.get_errno())}')
+            logger.error(
+                f'Unable to normalize process {pid}: {os.strerror(ct.get_errno())}')
         return rc
 
     def sensitize_profile(self, profile_key: int):
@@ -322,7 +328,8 @@ class BPFProgram:
             logger.error(f'Unable to sensitize profile.', exc_info=e)
             return -1
         if rc < 0:
-            logger.error(f'Unable to sensitize profile: {os.strerror(ct.get_errno())}')
+            logger.error(
+                f'Unable to sensitize profile: {os.strerror(ct.get_errno())}')
             return rc
         exe = self.profile_key_to_exe[profile_key]
         logger.info(f'Sensitized profile {exe}. Training data reset.')
@@ -338,7 +345,8 @@ class BPFProgram:
             logger.error(f'Unable to sensitize process {pid}.', exc_info=e)
             return -1
         if rc < 0:
-            logger.error(f'Unable to sensitize process {pid}: {os.strerror(ct.get_errno())}')
+            logger.error(
+                f'Unable to sensitize process {pid}: {os.strerror(ct.get_errno())}')
             return rc
         try:
             process = self.get_process(pid)
@@ -358,7 +366,8 @@ class BPFProgram:
             logger.error(f'Unable to tolerize profile.', exc_info=e)
             return -1
         if rc < 0:
-            logger.error(f'Unable to tolerize profile: {os.strerror(ct.get_errno())}')
+            logger.error(
+                f'Unable to tolerize profile: {os.strerror(ct.get_errno())}')
             return rc
         exe = self.profile_key_to_exe[profile_key]
         logger.info(f'Tolerized profile {exe}. Stopped normal monitoring.')
@@ -374,7 +383,8 @@ class BPFProgram:
             logger.error(f'Unable to tolerize process {pid}.', exc_info=e)
             return -1
         if rc < 0:
-            logger.error(f'Unable to tolerize process {pid}: {os.strerror(ct.get_errno())}')
+            logger.error(
+                f'Unable to tolerize process {pid}: {os.strerror(ct.get_errno())}')
             return rc
         try:
             process = self.get_process(pid)
@@ -531,7 +541,8 @@ class BPFProgram:
             lfc = event.lfc
             exe = self.profile_key_to_exe[profile_key]
 
-            logger.info(f'Tolerize limit exceeded for PID {pid} ({exe}), LFC is {lfc}. Training data reset.')
+            logger.info(
+                f'Tolerize limit exceeded for PID {pid} ({exe}), LFC is {lfc}. Training data reset.')
 
     def _generate_syscall_defines(self, flags: List[str]) -> None:
         from bcc.syscall import syscalls
@@ -549,7 +560,8 @@ class BPFProgram:
 
     def _bootstrap_processes(self):
         for profile_key, exe, pid, tid in running_processes():
-            logger.debug(f'Found process {pid},{tid} running {exe} ({profile_key})')
+            logger.debug(
+                f'Found process {pid},{tid} running {exe} ({profile_key})')
             Lib.bootstrap_process(profile_key, tid, pid, exe.encode('ascii'))
             self.bpf.ring_buffer_consume()
 
@@ -573,14 +585,19 @@ class BPFProgram:
 
     def _load_bpf(self) -> None:
         assert self.bpf is None
-        logger.info('Loading BPF program...')
+        logger.info(f'Loading BPF program {defs.BPF_PROGRAM_C}...')
 
         with open(defs.BPF_PROGRAM_C, 'r') as f:
             bpf_text = f.read()
 
+        logger.debug(f'BPF text: {bpf_text}')
+
         self.bpf = BPF(
             text=bpf_text, usdt_contexts=[Lib.usdt_context], cflags=self.cflags
         )
+
+        logger.debug('Unregistering BPG cleanup function')
+
         # FIXME: BPF cleanup function is segfaulting, so unregister it for now.
         # It actually doesn't really do anything particularly useful.
         atexit.unregister(self.bpf.cleanup)
